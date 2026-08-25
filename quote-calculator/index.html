@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Alpha Nation Quote Calculator</title>
+<style>
+:root{--bg:#050a10;--panel:#0b1420;--panel2:#0e1b29;--line:#1b344a;--blue:#168cff;--blue2:#39b8ff;--text:#f4f8fb;--muted:#8ea1b0;--green:#55df82;--amber:#f4bd4f;--red:#ff6868}*{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at 50% 0,#0d2840 0,#050a10 42%);color:var(--text);font-family:Inter,system-ui,-apple-system,Segoe UI,sans-serif}button,input,select{font:inherit}.wrap{max-width:1250px;margin:auto;padding:18px}.header{display:flex;align-items:center;justify-content:space-between;gap:15px;margin-bottom:16px}.brand{display:flex;align-items:center;gap:11px}.logo{width:42px;height:42px;border:1px solid #21618b;border-radius:10px;display:grid;place-items:center;color:#fff;font-weight:900;background:linear-gradient(145deg,#0a67d8,#08253a);box-shadow:0 0 30px #008cff25}.brand b{font-size:17px}.brand span{display:block;color:var(--muted);font-size:9px;letter-spacing:1.6px;text-transform:uppercase;margin-top:2px}.status{font-size:9px;color:#9bb0c0}.status i{display:inline-block;width:7px;height:7px;background:var(--green);border-radius:50%;margin-right:5px}.panel{background:linear-gradient(145deg,#0b1622,#08111a);border:1px solid var(--line);border-radius:12px;box-shadow:0 18px 50px #0008}.inputs{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;padding:14px}.field label{display:block;font-size:9px;color:var(--muted);margin:0 0 5px}.field select,.field input{width:100%;height:38px;background:#050b12;border:1px solid #1a344a;border-radius:7px;color:#fff;padding:0 10px;outline:none}.field select:focus,.field input:focus{border-color:var(--blue)}.faces{padding:0 14px 14px}.faces h3,.results h2{font-size:11px;margin:0 0 9px}.face-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}.face{position:relative}.face input{width:100%;height:38px;background:#050b12;border:1px solid #1a344a;border-radius:7px;color:#fff;padding:0 10px}.face small{position:absolute;right:8px;top:12px;color:#607789;font-size:9px}.actions{display:flex;gap:8px;padding:0 14px 14px}.btn{height:38px;border:1px solid #1466a5;border-radius:7px;padding:0 15px;color:#fff;background:linear-gradient(100deg,#075dd9,#0a8cff);font-weight:800;font-size:10px}.btn.secondary{background:#091522;border-color:#203b51}.summary{display:grid;grid-template-columns:repeat(4,1fr);gap:9px;margin:14px 0}.stat{padding:12px;border:1px solid var(--line);background:#08131e;border-radius:9px}.stat small{display:block;color:var(--muted);font-size:8px}.stat b{font-size:18px;display:block;margin-top:5px}.results{margin-top:14px;padding:14px}.tabs{display:flex;gap:6px;margin-bottom:11px}.tab{border:1px solid var(--line);background:#07111a;color:#aebdca;padding:8px 11px;border-radius:6px;font-size:9px;cursor:pointer}.tab.active{background:#0a62c9;border-color:#168cff;color:#fff}.table-wrap{overflow:auto}table{width:100%;border-collapse:collapse;min-width:760px}th,td{padding:10px 8px;border-bottom:1px solid #132a3c;text-align:left;font-size:9px}th{color:#7f95a6;font-weight:700}td strong{font-size:10px}.price{font-size:14px;font-weight:900;color:#fff}.badge{display:inline-block;padding:3px 6px;border-radius:4px;font-size:7px;text-transform:uppercase;letter-spacing:.4px}.observed{background:#302711;color:#f4ca66}.verified{background:#0d3520;color:#63e990}.unavailable{background:#321616;color:#ff8585}.details{color:#8fa2b1}.empty{text-align:center;padding:35px;color:var(--muted);font-size:10px}.note{margin-top:12px;padding:10px;border:1px solid #3a3020;background:#151208;color:#cdbd91;border-radius:7px;font-size:8px;line-height:1.5}.footer{padding:16px 0;text-align:center;color:#536979;font-size:8px}@media(max-width:800px){.inputs{grid-template-columns:1fr 1fr}.face-grid{grid-template-columns:1fr 1fr}.summary{grid-template-columns:1fr 1fr}.header{align-items:flex-start}.status{max-width:160px;text-align:right}}@media(max-width:480px){.wrap{padding:10px}.inputs{grid-template-columns:1fr}.face-grid{grid-template-columns:1fr}.summary{grid-template-columns:1fr 1fr}.brand b{font-size:14px}}
+</style></head>
+<body><div class="wrap">
+<header class="header"><div class="brand"><div class="logo">AN</div><div><b>Alpha Nation Quote Calculator</b><span>Final Expense • V1</span></div></div><div class="status"><i></i>Rate database active • 5 carriers</div></header>
+<section class="panel">
+<div class="inputs">
+<div class="field"><label>Age</label><input id="age" type="number" min="18" max="100" value="70"></div>
+<div class="field"><label>Sex</label><select id="sex"><option value="F">Female</option><option value="M">Male</option></select></div>
+<div class="field"><label>Tobacco</label><select id="tobacco"><option value="N">Non-smoker</option><option value="S">Smoker</option></select></div>
+<div class="field"><label>Sort</label><select id="sort"><option value="price">Lowest monthly first</option><option value="carrier">Carrier / product</option></select></div>
+</div>
+<div class="faces"><h3>Face Amounts — up to 5</h3><div class="face-grid" id="faces"></div></div>
+<div class="actions"><button class="btn" id="quoteBtn">Get Quotes</button><button class="btn secondary" id="clearBtn">Clear</button><button class="btn secondary" id="printBtn">Print / Save PDF</button></div>
+</section>
+<div class="summary"><div class="stat"><small>Carriers searched</small><b id="carrierCount">5</b></div><div class="stat"><small>Rates found</small><b id="rateCount">0</b></div><div class="stat"><small>Lowest monthly</small><b id="lowest">—</b></div><div class="stat"><small>Database scope</small><b>Age 70</b></div></div>
+<section class="panel results"><h2>Price Compare</h2><div class="tabs"><button class="tab active" data-mode="compare">Compare</button><button class="tab" data-mode="product">Product by Product</button></div><div id="table"></div><div class="note">Rate policy: this calculator never estimates missing premiums. Rates supplied from FreeFEX are marked <b>Observed</b>. Carrier-source rates can be marked <b>Verified</b> after matching the exact current rate table. Missing combinations remain unavailable.</div></section>
+<div class="footer">Alpha Nation • Internal quoting tool • Verify eligibility and carrier availability before submitting an application.</div>
+</div>
+<script>
+const FACES=[2500,3500,5000,10000,15000,20000,25000];
+const D=[];
+function add(carrier,product,sex,tobacco,plan,method,vals,status='observed'){for(const [face,price] of Object.entries(vals))D.push({carrier,product,sex,tobacco,plan,method,face:+face,price,status});}
+// Age 70 Female — supplied FreeFEX/quote data
+add('American Amicable','Senior Choice','F','N','Immediate','MONTHLY-EFT',{2500:17.08,3500:22.85,5000:null,10000:null,25000:null});
+add('American Amicable','Senior Choice','F','N','Graded','MONTHLY-EFT',{2500:21.63,3500:29.23});
+add('American Amicable','Senior Choice','F','N','ROP','MONTHLY-EFT',{2500:26.64,3500:36.24});
+add('American Amicable','Senior Choice','F','S','Immediate','MONTHLY-EFT',{2500:20.03,3500:26.98});
+add('American Amicable','Senior Choice','F','S','Graded','MONTHLY-EFT',{2500:29.09,3500:39.67});
+add('American Amicable','Senior Choice','F','S','ROP','MONTHLY-EFT',{2500:34.31,3500:46.96});
+add('American Amicable','Clear Choice','F','N','Immediate','MONTHLY-EFT',{5000:37.41,10000:72.18,15000:106.95,20000:141.72,25000:176.49});
+add('American Amicable','Clear Choice','F','N','Graded','MONTHLY-EFT',{5000:55.54,10000:108.43,15000:161.32,20000:214.21});
+add('American Amicable','Clear Choice','F','N','ROP','MONTHLY-EFT',{5000:65.96,10000:129.27,15000:192.58,20000:255.89,25000:319.21});
+add('American Amicable','Clear Choice','F','S','Immediate','MONTHLY-EFT',{5000:37.41,10000:72.18,15000:106.95,20000:141.72,25000:176.49});
+add('American Amicable','Clear Choice','F','S','Graded','MONTHLY-EFT',{5000:55.54,10000:108.43,15000:161.32,20000:214.21,25000:267.11});
+add('American Amicable','Clear Choice','F','S','ROP','MONTHLY-EFT',{5000:65.96,10000:129.27,15000:192.58,20000:255.89,25000:319.21});
+add('Mutual of Omaha','Living Promise','F','N','Level','MONTHLY-BSP',{5000:28.22,10000:53.24,15000:78.26,20000:103.28,25000:128.29});
+add('Mutual of Omaha','Living Promise','F','S','Level','MONTHLY-BSP',{5000:38.84,10000:74.48,15000:110.11,20000:145.75,25000:181.38});
+add('Mutual of Omaha','Living Promise','F','N','Graded','MONTHLY-BSP',{5000:34.60,10000:66.00,15000:97.40,20000:128.80,25000:160.21});
+add('Mutual of Omaha','Living Promise','F','S','Graded','MONTHLY-BSP',{5000:34.60,10000:66.00,15000:97.40,20000:128.80,25000:160.21});
+add('CICA Life','Superior Choice','F','N','Standard','MONTHLY',{5000:41.77,10000:83.55,15000:125.32,20000:167.10,25000:208.87});
+add('CICA Life','Superior Choice','F','S','Standard','MONTHLY',{5000:41.77,10000:83.55,15000:125.32,20000:167.10,25000:208.87});
+add('CICA Life','Superior Choice','F','N','Guaranteed Issue','MONTHLY',{5000:75.70,10000:151.40,15000:227.10,20000:302.80,25000:378.50});
+add('CICA Life','Superior Choice','F','S','Guaranteed Issue','MONTHLY',{5000:75.70,10000:151.40,15000:227.10,20000:302.80,25000:378.50});
+add('Royal Neighbors','Ensured Legacy','F','N','Preferred','DIRECT-MONTHLY',{5000:29.79,10000:55.08,15000:80.37,20000:105.66,25000:130.95});
+add('Royal Neighbors','Ensured Legacy','F','N','Standard','DIRECT-MONTHLY',{5000:33.58,10000:62.66,15000:91.74,20000:120.82,25000:149.90});
+add('Royal Neighbors','Ensured Legacy','F','S','Preferred','DIRECT-MONTHLY',{5000:40.10,10000:75.69,15000:111.29,20000:146.88,25000:182.48});
+add('Royal Neighbors','Ensured Legacy','F','S','Standard','DIRECT-MONTHLY',{5000:53.97,10000:103.44,15000:152.91,20000:202.37,25000:251.84});
+add('TransAmerica','FE Express Solution','F','N','Level','MONTHLY',{5000:34.39,10000:65.17,15000:95.95,20000:126.73,25000:157.51});
+add('TransAmerica','FE Express Solution','F','N','Graded','MONTHLY',{5000:54.53,10000:105.44,15000:156.36,20000:207.28,25000:258.19});
+add('TransAmerica','FE Express Solution','F','S','Level','MONTHLY',{5000:52.12,10000:100.63,15000:149.14,20000:197.65,25000:246.15});
+add('TransAmerica','FE Express Solution','F','S','Graded','MONTHLY',{5000:66.67,10000:129.73,15000:192.79,20000:255.85});
+add('TransAmerica','FE Express Solution','F','N','Level','MONTHLY',{2500:19.00,3500:25.16});
+add('TransAmerica','FE Express Solution','F','N','Graded','MONTHLY',{2500:29.07,3500:39.25});
+add('TransAmerica','FE Express Solution','F','S','Level','MONTHLY',{2500:27.87,3500:37.57});
+add('TransAmerica','FE Express Solution','F','S','Graded','MONTHLY',{2500:35.14,3500:47.75});
+// Age 70 Male — supplied FreeFEX/quote data
+add('American Amicable','Senior Choice','M','N','Immediate','MONTHLY-EFT',{2500:21.68,3500:29.31,5000:40.72,10000:78.79,25000:193.01});
+add('American Amicable','Senior Choice','M','N','Graded','MONTHLY-EFT',{2500:28.17,3500:38.38,5000:53.71,10000:104.75,25000:257.91});
+add('American Amicable','Senior Choice','M','S','Immediate','MONTHLY-EFT',{2500:26.56,3500:36.13,5000:50.48,10000:98.32,25000:241.83});
+add('American Amicable','Senior Choice','M','S','Graded','MONTHLY-EFT',{2500:37.51,3500:51.46,5000:72.38,10000:142.12,25000:351.32});
+add('CICA Life','Superior Choice','M','N','Standard','MONTHLY',{2500:25.63,3500:35.88,5000:51.25,10000:102.51,25000:256.27});
+add('CICA Life','Superior Choice','M','S','Standard','MONTHLY',{2500:25.63,3500:35.88,5000:51.25,10000:102.51,25000:256.27});
+add('CICA Life','Superior Choice','M','N','Guaranteed Issue','MONTHLY',{2500:41.42,3500:57.99,5000:82.85,10000:165.69,25000:414.23});
+add('CICA Life','Superior Choice','M','S','Guaranteed Issue','MONTHLY',{2500:41.42,3500:57.99,5000:82.85,10000:165.69,25000:414.23});
+add('Mutual of Omaha','Living Promise','M','N','Level','MONTHLY-BSP',{2500:21.06,3500:28.20,5000:38.91,10000:74.61,25000:181.72});
+add('Mutual of Omaha','Living Promise','M','S','Level','MONTHLY-BSP',{2500:29.24,3500:39.66,5000:55.28,10000:107.36,25000:263.60});
+add('Mutual of Omaha','Living Promise','M','N','Graded','MONTHLY-BSP',{2500:24.61,3500:33.17,5000:46.01,10000:88.82,25000:217.25});
+add('Mutual of Omaha','Living Promise','M','S','Graded','MONTHLY-BSP',{2500:24.61,3500:33.17,5000:46.01,10000:88.82,25000:217.25});
+add('Royal Neighbors','Ensured Legacy','M','N','Preferred','DIRECT-MONTHLY',{2500:21.51,3500:28.31,5000:38.52,10000:72.54,25000:174.61});
+add('Royal Neighbors','Ensured Legacy','M','N','Standard','DIRECT-MONTHLY',{2500:23.83,3500:31.56,5000:43.16,10000:81.82,25000:197.80});
+add('Royal Neighbors','Ensured Legacy','M','N','Graded','DIRECT-MONTHLY',{2500:33.46,3500:45.04,5000:62.42,10000:120.33,25000:294.08});
+add('Royal Neighbors','Ensured Legacy','M','N','Guaranteed Issue','DIRECT-MONTHLY',{2500:60.75,3500:83.25,5000:117.00,10000:229.51,25000:567.00});
+add('Royal Neighbors','Ensured Legacy','M','N','Preferred','PAC-MONTHLY',{2500:20.79,3500:27.37,5000:37.24,10000:70.12,25000:168.78});
+add('Royal Neighbors','Ensured Legacy','M','N','Standard','PAC-MONTHLY',{2500:23.04,3500:30.51,5000:41.72,10000:79.09,25000:191.20});
+add('Royal Neighbors','Ensured Legacy','M','N','Graded','PAC-MONTHLY',{2500:32.34,3500:43.54,5000:60.33,10000:116.32,25000:284.27});
+add('Royal Neighbors','Ensured Legacy','M','N','Guaranteed Issue','PAC-MONTHLY',{2500:58.73,3500:80.48,5000:113.11,10000:221.85,25000:548.11});
+add('Royal Neighbors','Ensured Legacy','M','S','Preferred','DIRECT-MONTHLY',{2500:31.30,3500:42.02,5000:58.10,10000:111.69,25000:272.48});
+add('Royal Neighbors','Ensured Legacy','M','S','Standard','DIRECT-MONTHLY',{2500:34.93,3500:47.10,5000:65.36,10000:126.23,25000:308.81});
+add('Royal Neighbors','Ensured Legacy','M','S','Graded','DIRECT-MONTHLY',{2500:46.70,3500:63.58,5000:88.91,10000:173.31,25000:426.53});
+add('Royal Neighbors','Ensured Legacy','M','S','Guaranteed Issue','DIRECT-MONTHLY',{2500:60.75,3500:83.25,5000:117.00,10000:229.51,25000:567.00});
+add('Royal Neighbors','Ensured Legacy','M','S','Preferred','PAC-MONTHLY',{2500:30.25,3500:40.62,5000:56.16,10000:107.97,25000:263.39});
+add('Royal Neighbors','Ensured Legacy','M','S','Standard','PAC-MONTHLY',{2500:33.77,3500:45.53,5000:63.18,10000:122.02,25000:298.52});
+add('Royal Neighbors','Ensured Legacy','M','S','Graded','PAC-MONTHLY',{2500:45.15,3500:61.47,5000:85.94,10000:167.54,25000:412.31});
+add('Royal Neighbors','Ensured Legacy','M','S','Guaranteed Issue','PAC-MONTHLY',{2500:58.73,3500:80.48,5000:113.11,10000:221.85,25000:548.11});
+add('TransAmerica','FE Express Solution','M','N','Level','MONTHLY',{2500:24.23,3500:32.47,5000:44.84,10000:86.07,25000:209.75});
+add('TransAmerica','FE Express Solution','M','N','Graded','MONTHLY',{2500:36.17,3500:49.19,5000:68.72,10000:133.83,25000:329.17});
+add('TransAmerica','FE Express Solution','M','S','Level','MONTHLY',{2500:39.47,3500:53.81,5000:75.32,10000:147.03,25000:362.15});
+add('TransAmerica','FE Express Solution','M','S','Graded','MONTHLY',{2500:50.22,3500:68.87,5000:96.83,10000:190.05,25000:469.71});
+function setupFaces(){const el=document.getElementById('faces');el.innerHTML=FACES.slice(0,5).map((x,i)=>`<div class="face"><input class="faceInput" type="number" min="1" value="${x}" aria-label="Face amount ${i+1}"><small>#${i+1}</small></div>`).join('')}
+function money(v){return v==null?'—':'$'+v.toFixed(2)}
+function quote(){const age=+document.getElementById('age').value,sex=document.getElementById('sex').value,tob=document.getElementById('tobacco').value,faces=[...document.querySelectorAll('.faceInput')].map(x=>+x.value).filter(Boolean);let rows=[];if(age!==70){renderUnavailable('No exact rate records are loaded for age '+age+'. Add the verified/observed age-70+ data before quoting this age.');return}for(const face of faces){for(const r of D){if(r.sex===sex&&r.tobacco===tob&&r.face===face&&r.price!=null)rows.push({...r,face})}}rows.sort((a,b)=>document.getElementById('sort').value==='price'?a.price-b.price:(a.carrier+a.product+a.plan).localeCompare(b.carrier+b.product+b.plan));document.getElementById('rateCount').textContent=rows.length;document.getElementById('lowest').textContent=rows.length?money(rows[0].price):'—';render(rows)}
+function render(rows){if(!rows.length){renderUnavailable('No exact rates found for the selected inputs.');return}const mode=document.querySelector('.tab.active').dataset.mode;let html='<div class="table-wrap"><table><thead><tr><th>Carrier</th><th>Product</th><th>Plan</th><th>Face</th><th>Method</th><th>Monthly</th><th>Status</th></tr></thead><tbody>';for(const r of rows){html+=`<tr><td><strong>${r.carrier}</strong></td><td>${r.product}</td><td>${r.plan}</td><td>$${r.face.toLocaleString()}</td><td class="details">${r.method}</td><td class="price">${money(r.price)}</td><td><span class="badge ${r.status}">${r.status}</span></td></tr>`}html+='</tbody></table></div>';document.getElementById('table').innerHTML=html}
+function renderUnavailable(msg){document.getElementById('rateCount').textContent='0';document.getElementById('lowest').textContent='—';document.getElementById('table').innerHTML=`<div class="empty">${msg}</div>`}
+document.getElementById('quoteBtn').onclick=quote;document.getElementById('clearBtn').onclick=()=>{document.getElementById('age').value=70;document.getElementById('sex').value='F';document.getElementById('tobacco').value='N';setupFaces();renderUnavailable('Select your client details and click Get Quotes.')};document.getElementById('printBtn').onclick=()=>window.print();document.querySelectorAll('.tab').forEach(b=>b.onclick=()=>{document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));b.classList.add('active');quote()});setupFaces();quote();
+</script></body></html>
