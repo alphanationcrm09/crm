@@ -1,0 +1,9 @@
+[general]
+enabled = yes
+pretty = no
+allowed_origins = *
+
+[alpha-nation]
+type = user
+read_only = no
+password = CHANGE_ME
