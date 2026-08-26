@@ -12,7 +12,7 @@ permissions:
   id-token: write
 
 concurrency:
-  group: pages
+  group: alpha-nation-call-center-pages
   cancel-in-progress: true
 
 jobs:
@@ -23,18 +23,24 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@v5
+
       - name: Setup Pages
         uses: actions/configure-pages@v5
+
       - name: Prepare static preview
         run: |
+          set -e
+          test -f call-center/web/index.html
           mkdir -p _site
           cp -R call-center/web/. _site/
           touch _site/.nojekyll
+
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v4
         with:
           path: _site
+
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
