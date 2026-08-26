@@ -1,0 +1,27 @@
+{
+  "app": {
+    "name": "Alpha Nation Call Center",
+    "environment": "development",
+    "port": 8080
+  },
+  "telephony": {
+    "asterisk": {
+      "ariUrl": "http://127.0.0.1:8088/ari",
+      "ariUsername": "CHANGE_ME",
+      "ariPassword": "CHANGE_ME"
+    },
+    "sipProvider": {
+      "name": "CHANGE_ME",
+      "trunk": "CHANGE_ME"
+    }
+  },
+  "crm": {
+    "baseUrl": "https://YOUR-CRM-ENDPOINT",
+    "apiKey": "CHANGE_ME"
+  },
+  "recordings": {
+    "storage": "s3-compatible",
+    "bucket": "CHANGE_ME",
+    "retentionDays": 90
+  }
+}
