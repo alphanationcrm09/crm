@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Alpha Nation Call Center</title>
+<style>
+:root{color-scheme:dark;font-family:Inter,system-ui,sans-serif}*{box-sizing:border-box}body{margin:0;background:#090b10;color:#f5f7fa}header{padding:18px 24px;border-bottom:1px solid #242832;display:flex;justify-content:space-between;align-items:center}main{padding:20px;max-width:1500px;margin:auto}.grid{display:grid;grid-template-columns:1.4fr .8fr;gap:16px}.cards{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}.card,.panel{background:#11151d;border:1px solid #272c36;border-radius:12px;padding:16px}.metric{font-size:28px;font-weight:700}.muted{color:#9da5b4;font-size:13px}.row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 0;border-bottom:1px solid #222731}.row:last-child{border:0}.pill{padding:5px 9px;border-radius:999px;background:#202631;font-size:12px}.on{background:#153b2b;color:#79e2a9}.pause{background:#463916;color:#f1d27a}.call{background:#3d2020;color:#ff9b9b}button{background:#e9edf2;color:#0b0d11;border:0;border-radius:8px;padding:9px 12px;font-weight:650;cursor:pointer}button.secondary{background:#242a34;color:#f5f7fa}.actions{display:flex;gap:7px;flex-wrap:wrap}h2{margin:0 0 12px;font-size:17px}.wide{margin-top:16px}.bar{height:8px;background:#252b35;border-radius:9px;overflow:hidden}.bar i{display:block;height:100%;width:68%;background:#f5f7fa}.mono{font-variant-numeric:tabular-nums;font-family:ui-monospace,monospace}@media(max-width:900px){.grid{grid-template-columns:1fr}.cards{grid-template-columns:repeat(2,1fr)}}
+</style>
+</head>
+<body>
+<header><div><strong>ALPHA NATION</strong><span class="muted"> / Call Center</span></div><div class="muted">Supervisor Console · <span id="connection">Demo</span></div></header>
+<main>
+<section class="cards">
+<div class="card"><div class="muted">Agents Online</div><div class="metric" id="online">24</div></div>
+<div class="card"><div class="muted">On Call</div><div class="metric" id="oncall">8</div></div>
+<div class="card"><div class="muted">Calls Today</div><div class="metric">1,284</div></div>
+<div class="card"><div class="muted">Transfers</div><div class="metric">87</div></div>
+</section>
+<section class="grid wide">
+<div class="panel"><h2>Live Agents</h2><div id="agents"></div></div>
+<div class="panel"><h2>Active Call</h2><div id="active"><div class="muted">Select an on-call agent to monitor.</div></div></div>
+</section>
+<section class="panel wide"><h2>Campaign Activity</h2><div class="row"><div><strong>FE CPA</strong><div class="muted">Calls connected</div></div><strong>496</strong></div><div class="bar"><i></i></div><div class="row"><div><strong>FE CPL</strong><div class="muted">Calls connected</div></div><strong>318</strong></div><div class="bar"><i style="width:52%"></i></div></section>
+</main>
+<script>
+const demo=[
+{id:'a1',name:'Ahmed',status:'on_call',campaign:'FE CPA',time:277},
+{id:'a2',name:'Bilal',status:'paused',campaign:'FE CPL',time:742,pause:'Break'},
+{id:'a3',name:'Usman',status:'available',campaign:'FE CPA',time:18},
+{id:'a4',name:'Hamza',status:'on_call',campaign:'FE CPL',time:521},
+{id:'a5',name:'Ali',status:'available',campaign:'FE CPA',time:43},
+{id:'a6',name:'Saad',status:'wrap_up',campaign:'FE CPA',time:31}
+];
+let selected=null;
+const labels={on_call:'ON CALL',paused:'PAUSED',available:'AVAILABLE',wrap_up:'WRAP-UP',offline:'OFFLINE'};
+function fmt(s){return String(Math.floor(s/60)).padStart(2,'0')+':'+String(s%60).padStart(2,'0')}
+function render(){const el=document.querySelector('#agents');el.innerHTML=demo.map(a=>`<div class="row"><div><strong>${a.name}</strong><div class="muted">${a.campaign}${a.pause?' · '+a.pause:''}</div></div><div style="display:flex;align-items:center;gap:10px"><span class="pill ${a.status==='on_call'?'call':a.status==='paused'?'pause':a.status==='available'?'on':''}">${labels[a.status]} <span class="mono">${fmt(a.time)}</span></span>${a.status==='on_call'?`<button class="secondary" onclick="selectAgent('${a.id}')">Monitor</button>`:''}</div></div>`).join('');document.querySelector('#online').textContent=demo.filter(a=>a.status!=='offline').length;document.querySelector('#oncall').textContent=demo.filter(a=>a.status==='on_call').length}
+function selectAgent(id){selected=demo.find(a=>a.id===id);document.querySelector('#active').innerHTML=`<div><strong>${selected.name}</strong><div class="muted">${selected.campaign} · Active call <span class="mono">${fmt(selected.time)}</span></div></div><div class="actions" style="margin-top:14px"><button onclick="monitor('listen')">Listen</button><button class="secondary" onclick="monitor('whisper')">Whisper</button><button class="secondary" onclick="monitor('barge')">Barge</button><button class="secondary">Transfer</button></div><div class="muted" style="margin-top:14px">Monitoring actions must be authorized and are intended to be audit logged by the backend.</div>`}
+function monitor(mode){if(!selected)return;alert(mode.toUpperCase()+' requested for '+selected.name+' (backend integration pending).')}
+render();setInterval(()=>{demo.forEach(a=>a.time++);render();if(selected)selectAgent(selected.id)},1000);
+</script>
+</body>
+</html>
