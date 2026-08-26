@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Alpha Nation Call Center</title>
+<style>
+:root{color-scheme:dark;font-family:Inter,system-ui,-apple-system,Segoe UI,sans-serif}*{box-sizing:border-box}body{margin:0;background:#090b10;color:#eef2f7}button,select,input{font:inherit}button{cursor:pointer}.app{min-height:100vh;display:grid;grid-template-columns:240px 1fr}.side{border-right:1px solid #20252e;padding:22px;background:#0d1016}.brand{font-weight:800;font-size:19px;margin-bottom:28px}.brand small{display:block;color:#7f8a99;font-size:11px;font-weight:500;margin-top:4px}.nav{display:grid;gap:7px}.nav button{border:0;background:transparent;color:#9da7b5;text-align:left;padding:11px 12px;border-radius:9px}.nav button.active,.nav button:hover{background:#171c24;color:#fff}.main{padding:24px;max-width:1500px;width:100%;margin:auto}.top{display:flex;justify-content:space-between;gap:16px;align-items:center;margin-bottom:22px}.top h1{font-size:24px;margin:0}.sub{color:#7f8a99;font-size:13px;margin-top:5px}.actions{display:flex;gap:8px}.btn{border:1px solid #2a313c;background:#121720;color:#e8edf4;border-radius:8px;padding:9px 13px}.btn.primary{background:#fff;color:#090b10;border-color:#fff}.grid{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:16px}.card{background:#0e1219;border:1px solid #202631;border-radius:12px;padding:16px}.metric{font-size:25px;font-weight:750;margin-top:7px}.label{font-size:12px;color:#7f8a99}.layout{display:grid;grid-template-columns:1.7fr 1fr;gap:16px}.panel{background:#0e1219;border:1px solid #202631;border-radius:12px;overflow:hidden}.panel h2{font-size:14px;margin:0;padding:15px 16px;border-bottom:1px solid #202631}.toolbar{padding:12px 16px;display:flex;gap:8px;flex-wrap:wrap;border-bottom:1px solid #202631}.toolbar select,.toolbar input{background:#0b0e13;color:#e8edf4;border:1px solid #29303b;border-radius:7px;padding:8px}.table{width:100%;border-collapse:collapse}.table th,.table td{padding:12px 14px;border-bottom:1px solid #1b212a;text-align:left;font-size:12px}.table th{color:#7f8a99;font-weight:600}.status{display:inline-flex;align-items:center;gap:6px}.dot{width:7px;height:7px;border-radius:50%;background:#77808d}.on .dot{background:#63d391}.call .dot{background:#e6b85c}.pause .dot{background:#b56cff}.offline .dot{background:#59616d}.timer{font-variant-numeric:tabular-nums}.monitor{display:grid;gap:10px;padding:14px}.agent{border:1px solid #202631;border-radius:9px;padding:12px}.agentline{display:flex;justify-content:space-between;gap:10px}.agent strong{font-size:13px}.agent .meta{color:#7f8a99;font-size:11px;margin-top:6px}.agent .controls{display:flex;gap:6px;margin-top:9px}.mini{padding:6px 8px;border-radius:6px;border:1px solid #2a313c;background:#121720;color:#dce2ea;font-size:11px}.footer{color:#66717f;font-size:11px;margin-top:16px}@media(max-width:1000px){.grid{grid-template-columns:repeat(2,1fr)}.layout{grid-template-columns:1fr}.app{grid-template-columns:1fr}.side{display:none}}@media(max-width:550px){.grid{grid-template-columns:1fr}.main{padding:14px}.top{align-items:flex-start;flex-direction:column}}
+</style>
+</head>
+<body>
+<div class="app">
+<aside class="side"><div class="brand">ALPHA NATION<small>CALL CENTER</small></div><div class="nav"><button class="active">Live Dashboard</button><button>Auto Dialer</button><button>Campaigns</button><button>DIDs</button><button>Agents</button><button>Call History</button><button>Recordings</button><button>Analytics</button><button>Settings</button></div></aside>
+<main class="main">
+<div class="top"><div><h1>Live Call Center</h1><div class="sub">Control plane foundation. Real telephony connects through the backend.</div></div><div class="actions"><button class="btn">Import Leads</button><button class="btn primary" onclick="toggleDialer()">Start Dialer</button></div></div>
+<section class="grid">
+<div class="card"><div class="label">Agents Online</div><div class="metric" id="online">42</div></div>
+<div class="card"><div class="label">On Call</div><div class="metric" id="oncall">21</div></div>
+<div class="card"><div class="label">Available</div><div class="metric" id="available">8</div></div>
+<div class="card"><div class="label">Paused</div><div class="metric" id="paused">7</div></div>
+<div class="card"><div class="label">Calls Today</div><div class="metric" id="calls">4,821</div></div>
+</section>
+<div class="layout">
+<section class="panel"><h2>Live Agents</h2><div class="toolbar"><select><option>All Campaigns</option><option>FE CPA</option><option>FE CPL</option></select><select><option>All Statuses</option><option>On Call</option><option>Available</option><option>Paused</option></select><input placeholder="Search agent"></div><table class="table"><thead><tr><th>Agent</th><th>Status</th><th>Campaign</th><th>Call timer</th><th>Actions</th></tr></thead><tbody id="agents"></tbody></table></section>
+<section class="panel"><h2>Supervisor Monitor</h2><div class="monitor" id="monitor"></div></section>
+</div>
+<div class="footer">Prototype only. Listen, whisper, barge, recording, dialing and transfers require authenticated backend telephony services and appropriate authorization.</div>
+</main></div>
+<script>
+const agents=[['Ahmed Khan','ON CALL','FE CPA','04:37','call'],['Bilal Ahmed','PAUSED','FE CPL','12:42','pause'],['Usman Ali','AVAILABLE','FE CPA','00:18','on'],['Hamza Raza','WRAP-UP','FE CPL','00:31','on'],['Ali Hassan','ON CALL','FE CPA','08:41','call'],['Saad Khan','AVAILABLE','FE CPL','00:42','on']];
+function render(){document.querySelector('#agents').innerHTML=agents.map((a,i)=>`<tr><td><strong>${a[0]}</strong></td><td><span class="status ${a[4]}"><span class="dot"></span>${a[1]}</span></td><td>${a[2]}</td><td class="timer">${a[3]}</td><td><button class="mini" onclick="monitor(${i})">Monitor</button></td></tr>`).join('');document.querySelector('#monitor').innerHTML=agents.filter(a=>a[1]==='ON CALL').map((a,i)=>`<div class="agent"><div class="agentline"><strong>${a[0]}</strong><span class="status call"><span class="dot"></span>${a[3]}</span></div><div class="meta">${a[2]} · active call</div><div class="controls"><button class="mini" onclick="alert('Listen requires the authenticated telephony backend.')">Listen</button><button class="mini" onclick="alert('Whisper requires the authenticated telephony backend.')">Whisper</button><button class="mini" onclick="alert('Barge requires the authenticated telephony backend.')">Barge</button></div></div>`).join('')}
+function monitor(i){alert(`Supervisor monitoring target: ${agents[i][0]}\nStatus: ${agents[i][1]}\nCampaign: ${agents[i][2]}\nTimer: ${agents[i][3]}`)}
+let running=false;function toggleDialer(){running=!running;document.querySelector('.primary').textContent=running?'Stop Dialer':'Start Dialer';if(running){let n=Number(document.querySelector('#calls').textContent.replace(',',''));document.querySelector('#calls').textContent=(n+1).toLocaleString()}}
+render();
+</script>
+</body></html>
