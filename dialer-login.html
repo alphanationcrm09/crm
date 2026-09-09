@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#02050a">
+<title>Alpha Nation Dialer Login</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+:root{--bg:#02050a;--panel:#07111b;--line:#173047;--blue:#087dff;--text:#f7fbff;--muted:#8ea2b2;--red:#ff6464}*{box-sizing:border-box}body{margin:0;min-height:100vh;background:radial-gradient(circle at 50% 0,#0b2033 0,#02050a 48%);color:var(--text);font-family:Inter,system-ui,-apple-system,"Segoe UI",sans-serif;display:grid;place-items:center;padding:18px}.card{width:min(420px,100%);background:linear-gradient(145deg,#0a1622,#07101a);border:1px solid var(--line);border-radius:12px;padding:24px;box-shadow:0 24px 80px #000b}.brand{display:flex;align-items:center;gap:11px;margin-bottom:24px}.logo{width:42px;height:36px;border:1px solid #176da5;border-radius:8px;display:grid;place-items:center;color:#21a7ff;font-weight:900}.brand b{font-size:14px}.brand span{color:#188cff}.eyebrow{color:#6f8493;font-size:10px;letter-spacing:1.5px;text-transform:uppercase}.title{font-size:24px;font-weight:800;margin:5px 0 7px}.sub{color:var(--muted);font-size:12px;margin-bottom:22px}.field{margin-bottom:12px}.field label{display:block;color:#8ea2b2;font-size:10px;margin-bottom:6px}.field input{width:100%;height:42px;background:#03090f;border:1px solid #173047;color:#fff;border-radius:7px;padding:0 12px;outline:none}.field input:focus{border-color:#087dff}.btn{width:100%;height:43px;border:1px solid #0d8dff;background:linear-gradient(100deg,#0759d8,#087fff);color:#fff;border-radius:7px;font-weight:800;cursor:pointer}.btn:disabled{opacity:.55}.error{display:none;margin:0 0 12px;padding:10px;border:1px solid #6b2828;background:#351313;color:#ff9b9b;border-radius:7px;font-size:11px}.error.show{display:block}.status{margin-top:14px;color:#6f8493;font-size:10px;text-align:center}.note{margin-top:20px;padding:10px;border:1px solid #5a4319;background:#21190b;color:#ffd879;border-radius:7px;font-size:10px;line-height:1.45}
+</style>
+</head>
+<body>
+<main class="card">
+  <div class="brand"><div class="logo">AN</div><b>ALPHA <span>NATION</span></b></div>
+  <div class="eyebrow">Operations</div>
+  <div class="title">Dialer Login</div>
+  <div class="sub">Sign in with your Alpha Nation account. Dialer access is controlled by your assigned role and campaign permissions.</div>
+  <div id="error" class="error"></div>
+  <form id="form">
+    <div class="field"><label>Email</label><input id="email" type="email" autocomplete="username" required></div>
+    <div class="field"><label>Password</label><input id="password" type="password" autocomplete="current-password" required></div>
+    <button id="submit" class="btn" type="submit">Sign In</button>
+  </form>
+  <div id="status" class="status"></div>
+  <div class="note">Telephony is intentionally separate from authentication. The Dialer can be prepared and tested before a SIP/voice provider is connected.</div>
+</main>
+<script>
+const SUPABASE_URL='https://yzhtisfmlowkcvavgsxd.supabase.co';
+const SUPABASE_KEY='sb_publishable_GIhI_6sDVvzggGR1nVvEBg_psCt4iQu';
+const supabase=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}});
+const form=document.getElementById('form'),submit=document.getElementById('submit'),error=document.getElementById('error'),status=document.getElementById('status');
+function fail(message){error.textContent=message;error.classList.add('show');status.textContent=''}
+async function boot(){const {data:{session}}=await supabase.auth.getSession();if(session){status.textContent='Existing session found. Opening Dialer…';location.replace('dialer.html');}}
+form.addEventListener('submit',async e=>{e.preventDefault();error.classList.remove('show');submit.disabled=true;status.textContent='Signing in…';const {error:e2}=await supabase.auth.signInWithPassword({email:document.getElementById('email').value.trim(),password:document.getElementById('password').value});if(e2){fail(e2.message);submit.disabled=false;return}status.textContent='Authenticated. Opening Dialer…';location.replace('dialer.html')});
+boot();
+</script>
+</body>
+</html>
