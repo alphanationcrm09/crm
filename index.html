@@ -414,15 +414,15 @@ const configs={
  campaigns:{title:"Campaigns",table:"campaigns",cols:[["name","Campaign"],["campaign_type","Type"],["states","States"],["status","Status"]],fields:[["name","Campaign Name","text",1],["campaign_type","Campaign Type","text",1],["buyer_id","Buyer","buyer"],["states","States","text"],["status","Status","select",0,["Active","Paused","Inactive"]]]},
  teams:{title:"Teams",table:"teams",cols:[["name","Team"],["active","Active"],["created_at","Created"]],fields:[["name","Team Name","text",1],["active","Active","boolean"]]}
 };
-const nav=["dashboard","policies","policy-status","applications","leads","calls","buyers","carriers","campaigns","teams","users","audit-log"];
+const nav=["dashboard","policies","policy-status","lapsed-policies","applications","leads","calls","buyers","carriers","campaigns","teams","users","audit-log"];
 function esc(v){return String(v??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[m]))}
 function toast(msg,error=false){$("toast").textContent=msg;$("toast").style.color=error?"#ff7474":"#fff";$("toast").classList.remove("hidden");clearTimeout(window.__toast);window.__toast=setTimeout(()=>$("toast").classList.add("hidden"),2800)}
 function timeout(p,ms,label){return Promise.race([p,new Promise((_,rej)=>setTimeout(()=>rej(new Error(label+" timed out.")),ms))])}
 function isOwner(){return profile?.role==="Owner"} function can(k,a="view"){return isOwner()||profile?.permissions?.[k]?.[a]===true||profile?.permissions?.[k]===true}
 async function loadProfile(id){const r=await timeout(db.from("profiles").select("id,email,role,team_id,full_name,active,permissions").eq("id",id).maybeSingle(),8000,"Profile request");if(r.error)throw r.error;if(!r.data)throw new Error("CRM profile not found.");if(r.data.active===false)throw new Error("This account is disabled.");profile=r.data;return profile}
-function buildNav(){const canUsers=isOwner()||profile?.role==="Admin"||profile?.permissions?.users?.view===true;const canAudit=isOwner()||profile?.role==="Admin";const items=nav.filter(k=>k==="dashboard"||k==="policy-status"||(k==="users"&&canUsers)||(k==="audit-log"&&canAudit)||can(k)||isOwner());const navLabels={"policy-status":"Policy Status","users":"User Management","audit-log":"Audit Log"};$("nav").innerHTML=items.map(k=>`<button data-page="${k}" class="${current===k?"active":""}"><span>${esc(navLabels[k]||configs[k]?.title||"Dashboard")}</span></button>`).join("");$("nav").querySelectorAll("button").forEach(b=>b.onclick=()=>navigate(b.dataset.page))}
+function buildNav(){const canUsers=isOwner()||profile?.role==="Admin"||profile?.permissions?.users?.view===true;const canAudit=isOwner()||profile?.role==="Admin";const items=nav.filter(k=>k==="dashboard"||k==="policy-status"||(k==="users"&&canUsers)||(k==="audit-log"&&canAudit)||can(k)||isOwner());const navLabels={"policy-status":"Policy Status","lapsed-policies":"Lapsed Policies","users":"User Management","audit-log":"Audit Log"};$("nav").innerHTML=items.map(k=>`<button data-page="${k}" class="${current===k?"active":""}"><span>${esc(navLabels[k]||configs[k]?.title||"Dashboard")}</span></button>`).join("");$("nav").querySelectorAll("button").forEach(b=>b.onclick=()=>navigate(b.dataset.page))}
 function updateProfileUI(){const name=profile?.full_name||profile?.email?.split("@")[0]||"Admin";$("profileName").textContent=name;$("profileRole").textContent=profile?.role||"User";$("avatar").textContent=name.slice(0,2).toUpperCase()}
-function navigate(p,opts){current=p;buildNav();closeMobile();if(!(opts&&opts.skipTransition)&&typeof window.alphaNationPageTransition==="function"){const target=document.querySelector(`#nav button[data-page="${p}"]`);window.alphaNationPageTransition(target)}const c=$("content");c.classList.remove("content");void c.offsetWidth;c.classList.add("content");if(p==="dashboard")dashboard();else if(p==="users")usersPage();else if(p==="audit-log")auditLogPage();else if(p==="policy-status")policyStatusPage();else modulePage(p)}
+function navigate(p,opts){current=p;buildNav();closeMobile();if(!(opts&&opts.skipTransition)&&typeof window.alphaNationPageTransition==="function"){const target=document.querySelector(`#nav button[data-page="${p}"]`);window.alphaNationPageTransition(target)}const c=$("content");c.classList.remove("content");void c.offsetWidth;c.classList.add("content");if(p==="dashboard")dashboard();else if(p==="users")usersPage();else if(p==="audit-log")auditLogPage();else if(p==="policy-status")policyStatusPage();else if(p==="lapsed-policies")lapsedPoliciesPage();else modulePage(p)}
 function openMobile(){$("sidebar").classList.add("open");$("mobileBackdrop").classList.add("open")}
 function closeMobile(){$("sidebar").classList.remove("open");$("mobileBackdrop").classList.remove("open")}
 function applySharedLogos(){document.querySelectorAll(".shared-logo").forEach(el=>{el.innerHTML=ALPHA_NATION_LOGO_SVG()})}
@@ -587,6 +587,55 @@ async function policyStatusPage(){current="policy-status";buildNav();
  let active=null;
  $("content").querySelectorAll(".status-card").forEach(card=>card.onclick=()=>{active=statuses.find(x=>x.key===card.dataset.status);$("content").querySelectorAll(".status-card").forEach(c=>c.classList.remove("active"));card.classList.add("active");render(active,$("statusPolicySearch").value||"")});
  $("statusPolicySearch").oninput=e=>{if(active)render(active,e.target.value)};
+}
+
+
+async function lapsedPoliciesPage(){
+ current="lapsed-policies";buildNav();
+ $("content").innerHTML=`<div class="module-head"><div><h2>Lapsed Policies</h2><p>Follow up on cancellations, failed drafts, reversals and chargebacks.</p></div><div class="module-actions"><button class="btn secondary" id="syncLapsed">Find Eligible Policies</button><button class="btn" id="addLapsed">+ Add Record</button></div></div><div class="table-panel"><div class="table-toolbar"><input id="lapsedSearch" placeholder="Search customer, phone or policy..."><select id="lapsedStatus"><option value="">All follow-up statuses</option><option>Needs callback</option><option>Contacted</option><option>Retry requested</option><option>Resubmitted</option><option>Recovered</option><option>Not interested</option><option>Do not call</option></select></div><div id="lapsedArea" class="table-wrap"><div class="empty"><span class="loader"></span> Loading...</div></div></div>`;
+ const load=async()=>{
+  const r=await db.from("lapsed_policies").select("*,carriers(name)").order("created_at",{ascending:false}).limit(2000);
+  if(r.error){$("lapsedArea").innerHTML='<div class="empty" style="color:#ff7474">'+esc(r.error.message)+'</div>';return}
+  const rows=r.data||[];
+  const render=()=>{
+   const q=String($("lapsedSearch").value||"").toLowerCase(),st=$("lapsedStatus").value;
+   const list=rows.filter(x=>(!st||x.recovery_status===st)&&(!q||[x.customer_name,x.phone,x.policy_number,x.reason,x.notes,x.carriers?.name].join(" ").toLowerCase().includes(q)));
+   $("lapsedArea").innerHTML=list.length?`<table><thead><tr><th>Customer</th><th>Phone</th><th>Policy</th><th>Carrier</th><th>Reason</th><th>Follow-up</th><th>Next Follow-up</th><th>Notes</th><th>Actions</th></tr></thead><tbody>${list.map(x=>`<tr><td>${esc(x.customer_name)}</td><td>${esc(x.phone||"—")}</td><td>${esc(x.policy_number||"—")}</td><td>${esc(x.carriers?.name||"—")}</td><td>${esc(x.reason)}</td><td>${esc(x.recovery_status)}</td><td>${esc(x.next_follow_up||"—")}</td><td>${esc(x.notes||"")}</td><td><button class="btn secondary lapsed-edit" data-id="${esc(x.id)}">Edit</button></td></tr>`).join("")}</tbody></table>`:'<div class="empty">No lapsed policies found. Use Find Eligible Policies to import cancelled or unsuccessful policies from your existing records.</div>';
+   $("lapsedArea").querySelectorAll(".lapsed-edit").forEach(b=>b.onclick=()=>editLapsed(rows.find(x=>x.id===b.dataset.id),load));
+  }; $("lapsedSearch").oninput=render;$("lapsedStatus").onchange=render;render();
+ };
+ $("addLapsed").onclick=()=>editLapsed(null,load);
+ $("syncLapsed").onclick=async()=>{
+  const b=$("syncLapsed");b.disabled=true;
+  try{
+   const [p,q]=await Promise.all([db.from("policies").select("id,customer_name,phone,policy_number,carrier_id,approval_status,first_draft_status,commission_status,retention_status,notes,internal_notes"),db.from("lapsed_policies").select("policy_id")]);
+   if(p.error||q.error)throw p.error||q.error;
+   const known=new Set((q.data||[]).map(x=>x.policy_id).filter(Boolean));
+   const eligible=(p.data||[]).filter(x=>!known.has(x.id)&&(
+    String(x.approval_status||"").toLowerCase()==="cancelled"||
+    String(x.first_draft_status||"").toLowerCase()==="failed"||
+    String(x.commission_status||"").toLowerCase()==="chargeback"||
+    String(x.retention_status||"").toLowerCase()==="chargeback"
+   ));
+   const payload=eligible.map(x=>({policy_id:x.id,customer_name:x.customer_name||"Unknown",phone:x.phone||null,policy_number:x.policy_number||null,carrier_id:x.carrier_id||null,reason:String(x.approval_status||"").toLowerCase()==="cancelled"?"Cancelled":String(x.first_draft_status||"").toLowerCase()==="failed"?"Payment failed":(String(x.commission_status||"").toLowerCase()==="chargeback"||String(x.retention_status||"").toLowerCase()==="chargeback")?"Chargeback":"Other",notes:[x.notes,x.internal_notes].filter(Boolean).join(" | ")}));
+   if(payload.length){const ins=await db.from("lapsed_policies").insert(payload);if(ins.error)throw ins.error}
+   toast(`Added ${payload.length} eligible polic${payload.length===1?"y":"ies"} to follow-up.`);await load();
+  }catch(e){toast("Unable to sync policies: "+e.message,true)}finally{b.disabled=false}
+ };
+ await load();
+}
+async function editLapsed(row,refresh){
+ const f=$("modalForm");editing=row||null;$("modalTitle").textContent=row?"Edit Lapsed Policy":"Add Lapsed Policy";
+ f.innerHTML=`<div><label>Customer Name *</label><input id="lp_customer" required></div><div><label>Phone</label><input id="lp_phone" type="tel"></div><div><label>Policy Number</label><input id="lp_number"></div><div><label>Carrier</label><select id="lp_carrier"><option value="">Select carrier</option></select></div><div><label>Reason *</label><select id="lp_reason"><option>Cancelled</option><option>Payment failed</option><option>Payment reversed</option><option>Chargeback</option><option>Never drafted</option><option>Other</option></select></div><div><label>Follow-up Status</label><select id="lp_status"><option>Needs callback</option><option>Contacted</option><option>Retry requested</option><option>Resubmitted</option><option>Recovered</option><option>Not interested</option><option>Do not call</option></select></div><div><label>Next Follow-up</label><input id="lp_date" type="date"></div><div class="wide"><label>Notes</label><textarea id="lp_notes"></textarea></div><div class="modal-foot"><button type="button" class="btn secondary" id="lp_cancel">Cancel</button><button class="btn" type="submit">Save Record</button></div>`;
+ const c=await db.from("carriers").select("id,name").order("name");
+ $("lp_carrier").innerHTML='<option value="">Select carrier</option>'+(c.data||[]).map(x=>`<option value="${esc(x.id)}">${esc(x.name)}</option>`).join("");
+ if(row){$("lp_customer").value=row.customer_name||"";$("lp_phone").value=row.phone||"";$("lp_number").value=row.policy_number||"";$("lp_carrier").value=row.carrier_id||"";$("lp_reason").value=row.reason||"Other";$("lp_status").value=row.recovery_status||"Needs callback";$("lp_date").value=row.next_follow_up||"";$("lp_notes").value=row.notes||""}
+ $("lp_cancel").onclick=closeModal;
+ f.onsubmit=async e=>{e.preventDefault();const data={customer_name:$("lp_customer").value.trim(),phone:$("lp_phone").value.trim()||null,policy_number:$("lp_number").value.trim()||null,carrier_id:$("lp_carrier").value||null,reason:$("lp_reason").value,recovery_status:$("lp_status").value,next_follow_up:$("lp_date").value||null,notes:$("lp_notes").value.trim(),updated_at:new Date().toISOString()};
+  const r=row?await db.from("lapsed_policies").update(data).eq("id",row.id):await db.from("lapsed_policies").insert(data);
+  if(r.error){toast("Unable to save: "+r.error.message,true);return}toast(row?"Lapsed policy updated.":"Lapsed policy added.");closeModal();await refresh();
+ };
+ $("modal").classList.remove("hidden");
 }
 
 function auditValue(v){
