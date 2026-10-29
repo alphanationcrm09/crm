@@ -526,18 +526,6 @@ async function dashboard(){
    const finalRevenue=Math.max(0,(commissions.length?revenue:fallbackPaid)-chargebacks);
    const finalPaid=finalRevenue;
 
-   // Pending Payout:
-   // Only policies that are still Submitted and have an Amount Payable selected.
-   // Approved, Declined, Cancelled, Paid and Chargeback policies are excluded.
-   const pendingPayoutPolicies=policies.filter(x=>{
-      const approval=String(x.approval_status||"").trim().toLowerCase();
-      const commissionStatus=String(x.commission_status||"").trim().toLowerCase();
-      const amount=Number(x.agreed_payout||0);
-      return amount>0 && (commissionStatus==="waiting for draft" || (approval==="submitted" && commissionStatus==="pending"));
-    });
-    const pendingPayoutAmount=pendingPayoutPolicies.reduce((sum,x)=>sum+Number(x.agreed_payout||0),0);
-    const finalFinancial=pendingPayoutPolicies.length?pendingPayoutAmount:null;
-
     // Payable Amount = only policies whose Commission Status is Payable.
     // Amount Payable is stored in policies.agreed_payout.
     const payablePolicies=policies.filter(x=>String(x.commission_status||"").trim().toLowerCase()==="payable" && Number(x.agreed_payout||0)>0);
